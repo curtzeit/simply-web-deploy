@@ -21,7 +21,7 @@ inputs:
   target-path:
     description: "The target directory for payload"
     required: false
-    default: '""'
+    default: ""
   target-delete:
     description: "Delete files on the destination computer that do not exist on the source computer"
     required: false
@@ -29,53 +29,74 @@ inputs:
   skip-directory-paths:
     description: "Comma-separated list of directories to skip during deployment"
     required: false
-    default: '""'
+    default: ""
   skip-files:
     description: "Comma-separated list of specific files to skip during deployment"
     required: false
-    default: '""'
+    default: ""
   skip-patterns:
     description: "Comma-separated list of regex patterns to skip during deployment"
     required: false
-    default: '""'
+    default: ""
 
 runs:
   using: "composite"
   steps:
     - name: Stop Application Pool
       shell: pwsh
+      env:
+        WEBSITE_NAME: ${{ inputs.website-name }}
+        SERVER_COMPUTER_NAME: ${{ inputs.server-computer-name }}
+        SERVER_USERNAME: ${{ inputs.server-username }}
+        SERVER_PASSWORD: ${{ inputs.server-password }}
       run: >
-        ${{ github.action_path }}/Scripts/Set-ApplicationPool.ps1
+        & "${{ github.action_path }}/Scripts/Set-ApplicationPool.ps1"
         StopAppPool
-        ${{ inputs.website-name }}
-        ${{ inputs.server-computer-name }}
-        ${{ inputs.server-username }}
-        ${{ inputs.server-password }}
+        "$env:WEBSITE_NAME"
+        "$env:SERVER_COMPUTER_NAME"
+        "$env:SERVER_USERNAME"
+        "$env:SERVER_PASSWORD"
 
     - name: Deploy Application
       shell: pwsh
+      env:
+        SOURCE_PATH: ${{ inputs.source-path }}
+        TARGET_PATH: ${{ inputs.target-path }}
+        WEBSITE_NAME: ${{ inputs.website-name }}
+        SERVER_COMPUTER_NAME: ${{ inputs.server-computer-name }}
+        SERVER_USERNAME: ${{ inputs.server-username }}
+        SERVER_PASSWORD: ${{ inputs.server-password }}
+        TARGET_DELETE: ${{ inputs.target-delete }}
+        SKIP_DIRECTORY_PATHS: ${{ inputs.skip-directory-paths }}
+        SKIP_FILES: ${{ inputs.skip-files }}
+        SKIP_PATTERNS: ${{ inputs.skip-patterns }}
       run: >
-        ${{ github.action_path }}/Scripts/Deploy-ApplicationPackage.ps1
-        ${{ inputs.source-path }}
-        ${{ inputs.target-path }}
-        ${{ inputs.website-name }}
-        ${{ inputs.server-computer-name }}
-        ${{ inputs.server-username }}
-        ${{ inputs.server-password }}
-        ${{ inputs.target-delete }}
-        ${{ inputs.skip-directory-paths }}
-        ${{ inputs.skip-files }}
-        ${{ inputs.skip-patterns }}
+        & "${{ github.action_path }}/Scripts/Deploy-ApplicationPackage.ps1"
+        "$env:SOURCE_PATH"
+        "$env:TARGET_PATH"
+        "$env:WEBSITE_NAME"
+        "$env:SERVER_COMPUTER_NAME"
+        "$env:SERVER_USERNAME"
+        "$env:SERVER_PASSWORD"
+        "$env:TARGET_DELETE"
+        "$env:SKIP_DIRECTORY_PATHS"
+        "$env:SKIP_FILES"
+        "$env:SKIP_PATTERNS"
 
     - name: Start Application Pool
       shell: pwsh
+      env:
+        WEBSITE_NAME: ${{ inputs.website-name }}
+        SERVER_COMPUTER_NAME: ${{ inputs.server-computer-name }}
+        SERVER_USERNAME: ${{ inputs.server-username }}
+        SERVER_PASSWORD: ${{ inputs.server-password }}
       run: >
-        ${{ github.action_path }}/Scripts/Set-ApplicationPool.ps1
+        & "${{ github.action_path }}/Scripts/Set-ApplicationPool.ps1"
         StartAppPool
-        ${{ inputs.website-name }}
-        ${{ inputs.server-computer-name }}
-        ${{ inputs.server-username }}
-        ${{ inputs.server-password }}
+        "$env:WEBSITE_NAME"
+        "$env:SERVER_COMPUTER_NAME"
+        "$env:SERVER_USERNAME"
+        "$env:SERVER_PASSWORD"
 
 branding:
   icon: "upload-cloud"

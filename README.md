@@ -1,4 +1,23 @@
 ## Simply Web Deploy
+
+> **This is curtzeit's fork of [rasmusbuchholdt/simply-web-deploy](https://github.com/rasmusbuchholdt/simply-web-deploy).**
+>
+> Upstream interpolates every action input directly into an unquoted PowerShell
+> command line, so any input containing a PowerShell metacharacter is parsed as
+> *syntax* rather than passed as a value. A web deploy password containing `{`
+> fails with:
+>
+> ```
+> Missing closing '}' in statement block or type definition.
+> ```
+>
+> which looks nothing like a credentials problem. It only surfaces when a password
+> is rotated into one containing those characters.
+>
+> This fork passes every input through the step `env:` block and references it as a
+> quoted `"$env:NAME"`, so values are never re-parsed as code. Behaviour is otherwise
+> identical and the inputs are unchanged. Use `curtzeit/simply-web-deploy@2.2.1`.
+
 Automatically deploy your projects to Simply.com or **any other place** that supports **Web Deploy** using this GitHub action. 
 
 This action utilizes Microsoft’s own `Web Deploy 3.0+` executable, which you can read everything about [here](https://docs.microsoft.com/en-us/aspnet/web-forms/overview/deployment/web-deployment-in-the-enterprise/deploying-web-packages). Further documentation of the rules and parameters can also be seen [here](https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2008-r2-and-2008/dd568992(v=ws.10)).
